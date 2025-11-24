@@ -1,0 +1,29 @@
+# servecies 
+services:
+  # Api setup stage
+  myapi:
+    build: .
+    ports:
+      - "8080:8080"
+    networks:
+      - net1
+    depends_on:
+      - sqlserver
+    environment:
+      - ConnectionStrings:DefaultConnection=server=sqlserver;Database=ElectroDB;User Id=sa;Password=@abc123@;Trust Server Certificate=true
+  # DataBase Setup Stage (Api Depends On it)
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    networks:
+      - net1
+    hostname: sqlserver
+    volumes:
+      - sqldata:/var/opt/mssql # to presiste the data generating from the container
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=@abc123@
+  # networks 
+networks:
+  net1: # Volums
+volumes:
+  sqldata:
