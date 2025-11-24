@@ -3,6 +3,8 @@ using DataAccessLayer.Context;
 using Microsoft.EntityFrameworkCore;
 using RepositoryLayer.IRepositories;
 using RepositoryLayer.Repositories;
+using Polly;
+using Microsoft.Data.SqlClient;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddAutoMapper(typeof(MappingConfig));
@@ -36,7 +38,11 @@ app.UseDeveloperExceptionPage();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<CompanyDbContext>();
-    db.Database.Migrate(); // applies any pending migrations
+    var retry = Policy.Handle<SqlException>()
+                  .WaitAndRetry(5, retryAttempt => TimeSpan.FromSeconds(5));
+
+    retry.Execute(() => db.Database.Migrate()); // preventing migration on unstarted database server ( keep trying ) to ensure database server up and running .
+    Console.WriteLine("Migration Done");
 }
 
 app.UseHttpsRedirection();
