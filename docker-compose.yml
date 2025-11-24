@@ -10,7 +10,7 @@ services:
     depends_on:
       - sqlserver
     environment:
-      - ConnectionStrings:DefaultConnection=server=sqlserver;Database=ElectroDB;User Id=sa;Password=@abc123@;Trust Server Certificate=true
+      - ConnectionStrings:DefaultConnection=server=sqlserver;Database=CompanyDB;User Id=sa;Password=@abc123@;Trust Server Certificate=true
   # DataBase Setup Stage (Api Depends On it)
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
